@@ -132,3 +132,33 @@
 :root { --nav-h: 69px; }
 @media (max-width: 720px) { :root { --nav-h: 61px; } }
 .dr-motion .op-stage { height: calc(var(--stage-h) - var(--nav-h)); min-height: 520px; }
+
+/* ---------- SC 06 — who it's for: a wheel of businesses, scrubbed by the scroll ---------- */
+.wh-track { position: relative; }
+.wh-stage { display: flex; flex-direction: column; gap: 40px; padding: 96px 0; box-sizing: border-box; }
+.wh-body { position: relative; display: flex; flex-direction: column; gap: 4px; }
+.wh-line { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 4.4vw, 64px); line-height: 1; letter-spacing: -0.04em; color: var(--text); }
+.wh-window {
+  --pw: clamp(0, calc((var(--p-who, 1) - 0.04) / 0.84), 1);
+  height: 3.12em; overflow: hidden;
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(44px, 13vw, 148px); line-height: 1.04; letter-spacing: -0.055em; color: var(--text);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.14) 28%, #000 35%, #000 65%, rgba(0, 0, 0, 0.14) 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.14) 28%, #000 35%, #000 65%, rgba(0, 0, 0, 0.14) 72%, transparent 100%);
+}
+.wh-list { display: flex; flex-direction: column; padding-top: 1.04em; transform: translate3d(0, calc(var(--pw) * -10.4em), 0); will-change: transform; }
+.wh-list > span { display: block; height: 1.04em; white-space: nowrap; }
+.wh-list > .hl { padding-bottom: 0; }
+.dr-motion .wh-track { height: calc(var(--stage-h) + 1500px); }
+.dr-motion .wh-stage { position: sticky; top: 0; height: var(--stage-h); justify-content: center; padding: 24px 0; }
+@media (max-width: 760px) { .wh-stage { gap: 28px; padding: 72px 0; } }
+/* Each word rests in the centre for most of its share of the scroll, then rolls to the next: the wheel
+   is still positioned by the scroll alone, it just never stops between two words. */
+@supports (width: calc(1px * round(down, 1.5, 1))) {
+  .wh-window {
+    --x: calc(var(--pw) * 10);
+    --fl: round(down, var(--x), 1);
+    --g: clamp(0, calc((var(--x) - var(--fl) - 0.28) / 0.44), 1);
+    --pos: calc(var(--fl) + var(--g) * var(--g) * (3 - 2 * var(--g)));
+  }
+  .wh-list { transform: translate3d(0, calc(var(--pos) * -1.04em), 0); }
+}
