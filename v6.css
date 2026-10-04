@@ -62,3 +62,16 @@
 .dr-motion .op-line.n0 .drop > span { transform: translateX(calc((1 - var(--on)) * -115%)); opacity: var(--on); transition: transform 520ms cubic-bezier(0.6, 0, 0.8, 0.4), opacity 260ms linear; transition-delay: calc(var(--d, 0) * 60ms); }
 /* Header: the wordmark (one dot) a touch larger. */
 .dr-nav__logo { height: 24px; }
+
+/* ---------- Founder: an Instagram-style profile card ---------- */
+.ig { display: flex; flex-direction: column; gap: 20px; max-width: 520px; padding: 24px; box-sizing: border-box; border: 1px solid var(--line-strong); border-radius: var(--radius-2); background: var(--surface-raised); }
+.ig-top { display: flex; align-items: center; gap: 16px; }
+.ig-ring { flex: none; display: block; padding: 3px; border-radius: 50%; background: var(--grad-btn); }
+.ig-avatar { display: block; width: 72px; height: 72px; border-radius: 50%; object-fit: cover; object-position: 50% 22%; border: 3px solid var(--surface-raised); box-sizing: content-box; }
+.ig-id { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ig-handle { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; color: var(--text); }
+.ig-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.ig-stats > div { display: flex; flex-direction: column; gap: 6px; }
+.ig-bio { margin: 0; font-size: 16px; line-height: 1.5; color: var(--text); }
+.ig .dr-btn { width: 100%; }
+@media (max-width: 760px) { .ig { padding: 18px; } .ig-avatar { width: 60px; height: 60px; } }

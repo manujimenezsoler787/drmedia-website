@@ -2,14 +2,9 @@ Archivo-Variable.woff2
 CNAME
 GeistMono-Medium.woff2
 GeistMono-Regular.woff2
-asset-27451140.jpg
-asset-9df5e0b7.jpg
 asset-adfc606b.png
+asset-cbedb9a9.jpg
 asset-cdb8f9de.png
-asset-dee963dc.jpg
-asset-f28ab4e1.jpg
-asset-f5295a60.jpg
-asset-ff865262.jpg
 bundle.css
 index.html
 site.css
