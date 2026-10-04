@@ -10,6 +10,20 @@
     return 'TC ' + pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60) + ':' + pad(f);
   }
 
+  function countUp(el) {
+    if (!motion) return;
+    var to = parseFloat(el.getAttribute('data-count')) || 0;
+    var dec = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    var t0 = performance.now();
+    function step(now) {
+      var p = Math.min(1, (now - t0) / 1600);
+      el.textContent = (to * (1 - Math.pow(1 - p, 3))).toFixed(dec) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
   function tick() {
     if (!motion) {
       ['--p-open', '--p-prompter', '--p-fn', '--p-steps', '--sc', '--a-fn', '--drop', '--scene', '--cta-bar', '--page-p', '--hud'].forEach(function (k) { doc.style.removeProperty(k); });
@@ -68,7 +82,7 @@
 
   function observe() {
     if (!io) return;
-    document.querySelectorAll('[data-reveal], [data-drop]').forEach(function (el) {
+    document.querySelectorAll('[data-reveal], [data-drop], [data-count]').forEach(function (el) {
       if (!el.classList.contains('is-in')) io.observe(el);
     });
   }
@@ -81,7 +95,7 @@
   if ('IntersectionObserver' in window) {
     io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        if (e.isIntersecting) { e.target.classList.add('is-in'); if (e.target.hasAttribute('data-count')) countUp(e.target); io.unobserve(e.target); }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   }
