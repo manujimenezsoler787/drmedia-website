@@ -95,3 +95,12 @@
 .dr-motion .op-line.n1 .op-sub { opacity: clamp(0, calc(var(--i, 0) * 3 - 2), 1); transform: translate3d(0, calc((1 - var(--i, 0)) * 18px), 0); transition: none; }
 /* The page scrubber grows by transform, not width, so it never triggers layout. */
 .dr-motion .prog { width: 100%; transform-origin: 0 50%; transform: scaleX(var(--page-p, 0)); }
+
+/* The header sits on Ink inside a Bone page: show only the logo drawn for Ink (the other one's dot was showing above it). */
+[data-theme="ink"] .dr-nav .dr-on-bone { display: none; }
+[data-theme="bone"] .dr-nav .dr-on-ink { display: none; }
+[data-theme="ink"] .dr-nav .dr-on-ink, [data-theme="bone"] [data-theme="bone"] .dr-nav .dr-on-bone { display: block; }
+
+/* Founder portrait: a modest frame, smaller still on phones. */
+.founder-photo { max-width: 340px; }
+@media (max-width: 960px) { .founder-photo { max-width: 168px; } }

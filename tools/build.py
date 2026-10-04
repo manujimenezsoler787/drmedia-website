@@ -287,6 +287,16 @@ def main():
 <meta property="og:description" content="%s">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://%s/">
+<meta property="og:site_name" content="dr.media">
+<meta property="og:image" content="https://%s/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://%s/og.png">
+<meta name="theme-color" content="#0e0e0e">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 %s
 </head>
 <body>
@@ -294,11 +304,16 @@ def main():
 <script src="site.js"></script>
 </body>
 </html>
-""" % (E(CFG["title"]), E(CFG["description"]), E(CFG["title"]), E(CFG["description"]), CFG["domain"],
+""" % (E(CFG["title"]), E(CFG["description"]), E(CFG["title"]), E(CFG["description"]), CFG["domain"], CFG["domain"], CFG["domain"],
        "\n".join('<link rel="stylesheet" href="%s">' % s for s in sheets), body)
     put("index.html", page)
     put("site.js", open(os.path.join(TOOLS, "site.js"), encoding="utf-8").read().replace("__CONTACT_EMAIL__", CFG["contact_email"]))
     put("CNAME", CFG["domain"])
+    # Site-level files that are not part of the canvas: favicon and the link-preview image.
+    static = os.path.join(TOOLS, "static")
+    for name in sorted(os.listdir(static)) if os.path.isdir(static) else []:
+        if not name.startswith("."):
+            put(name, open(os.path.join(static, name), "rb").read())
 
     # Drop files a previous build wrote that this one no longer does.
     manifest = os.path.join(TOOLS, "generated.txt")

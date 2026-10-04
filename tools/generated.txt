@@ -2,11 +2,15 @@ Archivo-Variable.woff2
 CNAME
 GeistMono-Medium.woff2
 GeistMono-Regular.woff2
+apple-touch-icon.png
 asset-adfc606b.png
 asset-cbedb9a9.jpg
 asset-cdb8f9de.png
 bundle.css
+favicon-192.png
+favicon-32.png
 index.html
+og.png
 site.css
 site.js
 v5.css
