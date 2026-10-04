@@ -1,0 +1,220 @@
+/* dr.media site — token variables (compiled from ds/drmedia/tokens.json), fonts, layout helpers and scroll motion. */
+
+@font-face { font-family: "Archivo"; src: url("Archivo-Variable.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("GeistMono-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("GeistMono-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+
+:root {
+  --brand-ink: #0e0e0e;
+  --brand-bone: #f5f4ef;
+  --signal-indigo: #3b2eff;
+  --signal-cyan: #22d3ff;
+  --font-display: "Archivo", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Archivo", "Neue Haas Grotesk Text Pro", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Geist Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+  --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px; --space-10: 160px;
+  --radius-0: 0px; --radius-1: 2px; --radius-2: 4px;
+  --aspect-wide: 16 / 9; --aspect-cinema: 2.39 / 1; --aspect-feed: 4 / 5; --aspect-vertical: 9 / 16; --aspect-square: 1 / 1;
+  --stage-h: min(100vh, 860px);
+}
+
+:root, [data-theme="bone"] {
+  --surface: var(--brand-bone);
+  --surface-raised: #fbfaf7;
+  --surface-sunk: #ebe9e2;
+  --text: var(--brand-ink);
+  --text-muted: #5e5d58;
+  --line: #d8d5cb;
+  --line-strong: #8e8b82;
+  --signal: var(--signal-indigo);
+  --on-signal: var(--brand-bone);
+  --focus: var(--signal-indigo);
+  --glow-dot: 0 0 18px rgba(59, 46, 255, 0.45);
+}
+
+[data-theme="ink"] {
+  --surface: var(--brand-ink);
+  --surface-raised: #181816;
+  --surface-sunk: #070707;
+  --text: var(--brand-bone);
+  --text-muted: #9c9a93;
+  --line: #2e2d2a;
+  --line-strong: #74726c;
+  --signal: var(--signal-cyan);
+  --on-signal: var(--brand-ink);
+  --focus: var(--signal-cyan);
+  --glow-dot: 0 0 24px rgba(34, 211, 255, 0.45);
+}
+
+body { margin: 0; background: var(--brand-bone); }
+a { color: inherit; }
+a:hover { color: var(--signal); }
+a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- Container + rhythm ---------- */
+.wrap { max-width: 1280px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
+.pad { padding-top: 160px; padding-bottom: 160px; }
+
+.g12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+.c-4 { grid-column: span 4; }
+.c-5 { grid-column: span 5; }
+.c-7 { grid-column: span 7; }
+.c-8 { grid-column: span 8; }
+.c-10 { grid-column: span 10; }
+.c-end-4 { grid-column: 9 / span 4; }
+.c-end-6 { grid-column: 7 / span 6; }
+.stagger { padding-top: 160px; }
+.g4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+
+/* ---------- Mono bits ---------- */
+.mono { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.tc::after { content: var(--tc, "TC 00:00:00:00"); }
+
+/* ---------- Crop marks ---------- */
+.cm { position: absolute; width: 18px; height: 18px; border: 0 solid var(--line-strong); pointer-events: none; }
+.cm.tl { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
+.cm.tr { top: 14px; right: 14px; border-top-width: 1px; border-right-width: 1px; }
+.cm.bl { bottom: 14px; left: 14px; border-bottom-width: 1px; border-left-width: 1px; }
+.cm.br { bottom: 14px; right: 14px; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* ---------- HERO: the reel takes over ---------- */
+.hero-track { position: relative; }
+.hero-stage {
+  --p: var(--p-hero, 0);
+  --ct: 50%; --cl: 54%;
+  position: relative; height: var(--stage-h); min-height: 620px; overflow: hidden;
+}
+.hero-copy {
+  position: relative; z-index: 1; height: 100%; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 28px; padding: 24px 32px 40px;
+  width: 54%;
+  opacity: calc(1 - var(--p) * 2.2);
+  transform: translateY(calc(var(--p) * -80px));
+}
+.hero-title { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(52px, 8vw, 140px); line-height: 0.86; letter-spacing: -0.055em; }
+.reel-box {
+  position: absolute; z-index: 2; background: var(--surface-sunk);
+  top: calc((1 - var(--p)) * var(--ct));
+  left: calc((1 - var(--p)) * var(--cl));
+  right: calc((1 - var(--p)) * 32px);
+  bottom: calc((1 - var(--p)) * 40px);
+  overflow: hidden;
+}
+.reel-box > img, .reel-box > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.reel-box .reel-tl { position: absolute; top: 22px; left: 26px; right: 26px; display: flex; justify-content: space-between; gap: 12px; }
+.reel-box .reel-bl { position: absolute; bottom: 22px; left: 26px; right: 26px; display: flex; justify-content: space-between; gap: 12px; }
+.reel-box .reel-play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: inline-flex; align-items: center; gap: 12px; padding: 14px 18px; min-height: 48px; box-sizing: border-box;
+  border: 1px solid var(--line-strong); color: var(--text); text-decoration: none;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.reel-box .reel-play:hover { border-color: var(--text); color: var(--text); }
+
+/* ---------- Drop lines (words fall into place) ---------- */
+.drop { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.drop > span { display: inline-block; }
+
+/* ---------- Marquee ---------- */
+.marquee { overflow: hidden; white-space: nowrap; padding: 56px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.marquee__row { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: clamp(56px, 8vw, 128px); line-height: 0.95; letter-spacing: -0.05em; }
+.marquee__row--a { transform: translateX(calc(var(--p-marquee, 0.5) * -32% - 4%)); color: var(--text); }
+.marquee__row--b { transform: translateX(calc(-36% + var(--p-marquee, 0.5) * 32%)); color: var(--text-muted); }
+
+/* ---------- Manifesto (words light up) ---------- */
+.manifesto { margin: 0; font-family: var(--font-display); font-weight: 750; font-size: clamp(30px, 3.9vw, 58px); line-height: 1.08; letter-spacing: -0.035em; color: var(--text); }
+
+/* ---------- Work: stacking cards ---------- */
+.stack { display: flex; flex-direction: column; gap: 48px; }
+.stack-card { background: var(--surface-raised); border: 1px solid var(--line); padding: 24px; box-sizing: border-box; }
+.stack-num { font-family: var(--font-display); font-weight: 800; font-size: 96px; line-height: 0.8; letter-spacing: -0.05em; color: var(--text-muted); }
+
+/* ---------- Process: the timeline under a playhead ---------- */
+.htrack { position: relative; }
+.hstage { position: relative; display: flex; flex-direction: column; gap: 56px; }
+.hclip { position: relative; }
+.hrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.take { display: flex; flex-direction: column; gap: 16px; padding: 0 24px 28px; min-height: 300px; box-sizing: border-box; background: var(--surface-raised); border: 1px solid var(--line); border-top: 2px solid var(--line-strong); }
+.take__tick { display: flex; justify-content: space-between; padding-top: 10px; }
+.playhead { position: absolute; top: -18px; bottom: -18px; left: 38%; width: 2px; background: var(--signal); pointer-events: none; z-index: 3; }
+.playhead::before { content: ""; position: absolute; top: 0; left: -6px; width: 14px; height: 14px; background: var(--signal); }
+
+/* ---------- Reels: floating at different speeds ---------- */
+.par { transform: translateY(calc((var(--p-reels, 0.5) - 0.5) * var(--s, 0px) * 2)); }
+
+/* ---------- CTA ---------- */
+.cta-title { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(60px, 12.5vw, 200px); line-height: 0.86; letter-spacing: -0.055em; }
+
+/* ---------- Stagger / speed / order helpers (set the custom properties the motion uses) ---------- */
+.d0 { --d: 0; } .d1 { --d: 1; } .d2 { --d: 2; } .d3 { --d: 3; } .d4 { --d: 4; }
+.k0 { --k: 0; } .k1 { --k: 1; } .k2 { --k: 2; }
+.s1 { --s: 70px; } .s2 { --s: -50px; } .s3 { --s: 90px; } .s4 { --s: -30px; }
+.w0 { --i: 0.120; } .w1 { --i: 0.134; } .w2 { --i: 0.149; } .w3 { --i: 0.163; } .w4 { --i: 0.178; }
+.w5 { --i: 0.192; } .w6 { --i: 0.207; } .w7 { --i: 0.221; } .w8 { --i: 0.236; } .w9 { --i: 0.250; }
+.w10 { --i: 0.265; } .w11 { --i: 0.279; } .w12 { --i: 0.294; } .w13 { --i: 0.308; } .w14 { --i: 0.323; }
+.w15 { --i: 0.337; } .w16 { --i: 0.352; } .w17 { --i: 0.366; } .w18 { --i: 0.381; } .w19 { --i: 0.395; }
+.w20 { --i: 0.410; } .w21 { --i: 0.424; } .w22 { --i: 0.439; } .w23 { --i: 0.453; } .w24 { --i: 0.468; }
+.w25 { --i: 0.482; } .w26 { --i: 0.497; } .w27 { --i: 0.511; } .w28 { --i: 0.526; } .w29 { --i: 0.540; }
+.hero-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 20px; }
+
+/* =====================================================================
+   MOTION — only when the page really scrolls and the viewer allows motion.
+   The page script adds html.dr-motion; without it everything sits still,
+   in its final place (that is what the canvas shows).
+   ===================================================================== */
+.dr-motion .hero-track { height: calc(var(--stage-h) + 1100px); }
+.dr-motion .hero-stage { position: sticky; top: 0; }
+
+@keyframes dr-drop { from { transform: translateY(-108%); } to { transform: translateY(0); } }
+.dr-motion .hero-title .drop > span { animation: dr-drop 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--d, 0) * 110ms + 120ms); }
+
+.dr-motion [data-reveal] { opacity: 0; transform: translateY(-36px); transition: opacity 450ms ease-out, transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1); transition-delay: calc(var(--d, 0) * 90ms); }
+.dr-motion [data-reveal].is-in { opacity: 1; transform: none; }
+
+.dr-motion [data-drop] .drop > span { transform: translateY(-108%); transition: transform 850ms cubic-bezier(0.2, 0.8, 0.2, 1); transition-delay: calc(var(--d, 0) * 120ms); }
+.dr-motion [data-drop].is-in .drop > span { transform: none; }
+@keyframes dr-snap { from { opacity: 0; } to { opacity: 1; } }
+.dr-motion [data-drop] .dr-dot { opacity: 0; }
+.dr-motion [data-drop].is-in .dr-dot { animation: dr-snap 1ms steps(1) 950ms both; }
+
+.dr-motion .w { opacity: clamp(0.16, calc((var(--p-manifesto, 1) - var(--i, 0)) * 14 + 0.16), 1); }
+
+.dr-motion .stack { gap: 120px; }
+.dr-motion .stack-card { position: sticky; top: calc(72px + var(--k, 0) * 28px); }
+
+.dr-motion .htrack { height: calc(var(--stage-h) + 1500px); }
+.dr-motion .hstage { position: sticky; top: 0; height: var(--stage-h); justify-content: center; overflow: hidden; }
+.dr-motion .hrow { display: flex; width: max-content; transform: translateX(var(--x-process, 0px)); }
+.dr-motion .hrow > .take { width: 500px; flex: none; min-height: 340px; }
+.dr-motion .playhead { left: 50%; }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 960px) {
+  .g12 { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .c-4, .c-5, .c-7, .c-8, .c-10, .c-end-4, .c-end-6 { grid-column: 1 / -1; }
+  .stagger { padding-top: 0; }
+  .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .hrow { grid-template-columns: minmax(0, 1fr); }
+  .playhead { display: none; }
+  .dr-motion .playhead { display: block; }
+  .dr-motion .hrow > .take { width: 300px; min-height: 320px; }
+  .hero-stage { --ct: 60%; --cl: 32px; }
+  .hero-copy { width: 100%; }
+  .hero-bottom { margin-top: 0; }
+  .hero-deck { display: none; }
+  .stack-num { font-size: 64px; }
+}
+
+@media (max-width: 560px) {
+  .wrap { padding-left: 16px; padding-right: 16px; }
+  .pad { padding-top: 96px; padding-bottom: 96px; }
+  .hero-copy { padding: 16px 16px 32px; }
+  .hero-stage { --ct: 62%; --cl: 16px; }
+  .reel-box { right: calc((1 - var(--p)) * 16px); bottom: calc((1 - var(--p)) * 24px); }
+  .marquee { padding: 40px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dr-motion [data-reveal], .dr-motion [data-drop] .drop > span, .dr-motion .hero-title .drop > span { transition: none; animation: none; opacity: 1; transform: none; }
+}
