@@ -101,6 +101,23 @@
 [data-theme="bone"] .dr-nav .dr-on-ink { display: none; }
 [data-theme="ink"] .dr-nav .dr-on-ink, [data-theme="bone"] [data-theme="bone"] .dr-nav .dr-on-bone { display: block; }
 
-/* Founder portrait: a modest frame, smaller still on phones. */
-.founder-photo { max-width: 340px; }
-@media (max-width: 960px) { .founder-photo { max-width: 168px; } }
+/* Founder: the profile card is the centerpiece, so the portrait appears once, large, as its avatar. */
+.ig { max-width: none; padding: 36px; gap: 28px; }
+.ig-top { gap: 24px; }
+.ig-ring { padding: 4px; }
+.ig-avatar { width: 148px; height: 148px; border-width: 4px; object-position: 50% 24%; }
+.ig-id { gap: 8px; }
+.ig-handle { font-size: 30px; letter-spacing: -0.02em; gap: 8px; }
+.ig-stats { padding: 24px 0; }
+.ig-num { font-size: 48px; }
+.ig-bio { font-size: 18px; }
+@media (max-width: 760px) {
+  .ig { padding: 20px; gap: 22px; }
+  .ig-top { gap: 16px; }
+  .ig-avatar { width: 104px; height: 104px; border-width: 3px; }
+  .ig-handle { font-size: 21px; }
+  .ig-badge { width: 18px; height: 18px; }
+  .ig-stats { padding: 18px 0; }
+  .ig-num { font-size: 32px; }
+  .ig-bio { font-size: 16px; }
+}
