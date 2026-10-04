@@ -121,3 +121,14 @@
   .ig-num { font-size: 32px; }
   .ig-bio { font-size: 16px; }
 }
+
+/* The process playhead moves by transform, so scrolling it never triggers layout. */
+.steps-fill { top: 8px; bottom: 8px; height: auto; transform-origin: 50% 0; transform: scaleY(var(--p-steps, 1)); }
+.steps-head { top: 8px; bottom: 8px; height: auto; background: none; box-shadow: none; pointer-events: none; transform: translate3d(0, calc(var(--p-steps, 1) * 100%), 0); }
+.steps-head::after { content: ""; position: absolute; left: 0; top: -6px; width: 13px; height: 13px; background: linear-gradient(135deg, var(--signal-indigo), var(--signal-cyan)); box-shadow: var(--glow-dot); }
+
+/* The header sits above the pinned cold open: take its height off the stage so the first screen
+   shows the whole stage, button and scroll cue included, instead of pushing them under the fold. */
+:root { --nav-h: 69px; }
+@media (max-width: 720px) { :root { --nav-h: 61px; } }
+.dr-motion .op-stage { height: calc(var(--stage-h) - var(--nav-h)); min-height: 520px; }

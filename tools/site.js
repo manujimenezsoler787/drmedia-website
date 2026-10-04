@@ -3,6 +3,8 @@
   var doc = document.documentElement;
   var raf = 0, motion = false, io = null;
   var open = { el: null, target: 0, cur: 0, raf: 0, last: 0 };
+  var coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  var lastW = 0;
 
   function timecode(ms) {
     var pad = function (n) { return String(n).padStart(2, '0'); };
@@ -20,10 +22,11 @@
   /* The cold open is scrubbed: the headline follows the scroll position, eased toward it each frame. */
   function glideOpen(now) {
     open.raf = 0;
-    var dt = Math.min(64, now - (open.last || now));
+    var dt = open.last ? Math.min(64, now - open.last) : 16;
     open.last = now;
     var d = open.target - open.cur;
-    open.cur = Math.abs(d) < 0.0006 ? open.target : open.cur + d * (1 - Math.exp(-dt / 110));
+    /* A finger already scrolls smoothly, so touch screens follow it exactly; a mouse wheel gets some glide. */
+    open.cur = coarse || Math.abs(d) < 0.0006 ? open.target : open.cur + d * (1 - Math.exp(-dt / 110));
     setVar(open.el, '--o', ease(range(open.cur, 0.08, 0.54)).toFixed(4));
     setVar(open.el, '--i', ease(range(open.cur, 0.40, 0.92)).toFixed(4));
     if (open.cur !== open.target) open.raf = requestAnimationFrame(glideOpen);
@@ -92,7 +95,7 @@
         setVar(m.el, '--sc', String(Math.min(lines - 1, Math.floor(m.p * lines))));
         open.el = m.el;
         open.target = m.p;
-        if (!open.raf) open.raf = requestAnimationFrame(glideOpen);
+        if (!open.raf) glideOpen(performance.now());
       }
       if (m.key === 'fn') {
         var a = m.top > vh * 0.2 ? -1 : Math.min(3, Math.floor(m.p * 4));
@@ -108,10 +111,9 @@
 
   function setup() {
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    doc.classList.remove('dr-motion');
-    var scrolls = doc.scrollHeight > window.innerHeight * 2;
-    motion = !reduce && scrolls;
-    if (motion) doc.classList.add('dr-motion');
+    var next = !reduce && doc.scrollHeight > window.innerHeight * 2;
+    if (next !== motion) { motion = next; doc.classList.toggle('dr-motion', motion); }
+    lastW = window.innerWidth;
     tick();
   }
 
@@ -122,10 +124,10 @@
     });
   }
 
-  window.addEventListener('scroll', function () {
-    if (!raf) raf = requestAnimationFrame(function () { raf = 0; tick(); });
-  }, { passive: true });
-  window.addEventListener('resize', setup);
+  function onScroll() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; tick(); }); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  /* Phones fire resize whenever the browser bar slides in or out mid-scroll: only a width change is a real resize. */
+  window.addEventListener('resize', function () { if (window.innerWidth === lastW) onScroll(); else setup(); });
 
   if ('IntersectionObserver' in window) {
     io = new IntersectionObserver(function (entries) {

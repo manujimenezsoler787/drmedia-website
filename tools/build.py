@@ -298,6 +298,7 @@ def main():
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 %s
+<style>[hidden] { display: none !important; }</style>
 </head>
 <body>
 %s
