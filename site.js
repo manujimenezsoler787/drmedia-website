@@ -27,8 +27,15 @@
     var d = open.target - open.cur;
     /* A finger already scrolls smoothly, so touch screens follow it exactly; a mouse wheel gets some glide. */
     open.cur = coarse || Math.abs(d) < 0.0006 ? open.target : open.cur + d * (1 - Math.exp(-dt / 110));
-    setVar(open.el, '--o', ease(range(open.cur, 0.08, 0.54)).toFixed(4));
-    setVar(open.el, '--i', ease(range(open.cur, 0.40, 0.92)).toFixed(4));
+    /* One scroll position drives the whole cold open: the feed flies and brakes (f), line 01 leaves (o),
+       one post lights up (l) and takes over the screen (k), line 02 lands on it (i). */
+    var p = open.cur;
+    setVar(open.el, '--f', (1 - Math.pow(1 - range(p, 0, 0.46), 3)).toFixed(4));
+    setVar(open.el, '--o', ease(range(p, 0.24, 0.50)).toFixed(4));
+    setVar(open.el, '--l', range(p, 0.42, 0.52).toFixed(4));
+    setVar(open.el, '--k', ease(range(p, 0.50, 0.72)).toFixed(4));
+    setVar(open.el, '--i', ease(range(p, 0.70, 0.94)).toFixed(4));
+    open.el.classList.toggle('is-held', p > 0.2);
     if (open.cur !== open.target) open.raf = requestAnimationFrame(glideOpen);
     else open.last = 0;
   }
@@ -53,7 +60,7 @@
     var hud = document.querySelector('.hud');
     var mbar = document.querySelector('.mbar');
     if (!motion) {
-      scrubs.forEach(function (el) { ['--p-' + el.getAttribute('data-scrub'), '--sc', '--o', '--i', '--a-fn', '--drop'].forEach(function (k) { el.style.removeProperty(k); }); });
+      scrubs.forEach(function (el) { ['--p-' + el.getAttribute('data-scrub'), '--sc', '--f', '--o', '--l', '--k', '--i', '--a-fn', '--drop'].forEach(function (k) { el.style.removeProperty(k); }); });
       if (prog) prog.style.removeProperty('--page-p');
       if (hud) { hud.style.removeProperty('--hud'); hud.style.removeProperty('--scene'); }
       if (mbar) mbar.style.removeProperty('--cta-bar');

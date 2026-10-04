@@ -162,3 +162,73 @@
   }
   .wh-list { transform: translate3d(0, calc(var(--pos) * -1.04em), 0); }
 }
+
+/* =====================================================================
+   Cold open, staged: a feed of generic posts flies past behind line 01, brakes, and one post
+   lights up and takes over the screen for line 02. The page script sets, on .op-track, 0 → 1:
+   --f feed travel · --o line 01 leaving · --l the post lighting · --k it filling the screen · --i line 02 landing.
+   ===================================================================== */
+.op-stage { --cw: clamp(112px, 17vw, 220px); --ch: calc(var(--cw) * 1.5); --pitch: calc(var(--ch) + 14px); --hero-m: 4; overflow: hidden; }
+.op-top, .op-lines, .op-bottom { position: relative; z-index: 1; }
+.fd { position: absolute; inset: 0; z-index: 0; overflow: hidden; display: flex; justify-content: center; gap: 14px; pointer-events: none; opacity: 0.55; }
+.fd-col { flex: none; width: var(--cw); margin-top: calc(var(--ch) * -0.35); }
+.fd-col.c2, .fd-col.c4 { margin-top: calc(var(--ch) * -0.8); }
+.fd-col.c1 { --m: 3.4; } .fd-col.c2 { --m: 4.6; } .fd-col.c3 { --m: 4; } .fd-col.c4 { --m: 4.8; } .fd-col.c5 { --m: 3.2; }
+.fd-roll { display: flex; flex-direction: column; gap: 14px; }
+.fd-card {
+  flex: none; height: var(--ch); box-sizing: border-box; border: 1px solid var(--line); border-radius: var(--radius-1);
+  background:
+    radial-gradient(circle at 20px 20px, #33322e 8px, transparent 9px),
+    linear-gradient(#33322e, #33322e) 36px 16px / 38% 6px no-repeat,
+    linear-gradient(#242421, #242421) 12px 40px / calc(100% - 24px) 58% no-repeat,
+    linear-gradient(#33322e, #33322e) 12px calc(100% - 30px) / 72% 6px no-repeat,
+    linear-gradient(#33322e, #33322e) 12px calc(100% - 16px) / 44% 6px no-repeat,
+    #181816;
+}
+.fd-roll > .fd-card:nth-child(even) {
+  background:
+    radial-gradient(circle at 20px 20px, #33322e 8px, transparent 9px),
+    linear-gradient(#33322e, #33322e) 36px 16px / 52% 6px no-repeat,
+    linear-gradient(#33322e, #33322e) 12px 42px / 80% 6px no-repeat,
+    linear-gradient(#33322e, #33322e) 12px 56px / 60% 6px no-repeat,
+    linear-gradient(#242421, #242421) 12px 76px / calc(100% - 24px) calc(100% - 92px) no-repeat,
+    #181816;
+}
+.fd-hero { display: none; }
+@media (max-width: 760px) { .op-stage { --hero-m: 4.6; } .fd-col.c4, .fd-col.c5 { display: none; } }
+
+@keyframes fd-drift { to { transform: translate3d(0, calc(var(--pitch) * -2), 0); } }
+.dr-motion .fd { opacity: calc(0.9 - var(--l, 0) * 0.4); }
+.dr-motion .fd-col { transform: translate3d(0, calc(var(--f, 0) * var(--m) * var(--pitch) * -1), 0); will-change: transform; }
+.dr-motion .fd-roll { animation: fd-drift 9s linear infinite; }
+.dr-motion .op-track.is-held .fd-roll { animation-play-state: paused; }
+.dr-motion .fd-hero { display: block; position: absolute; inset: 0; z-index: 0; pointer-events: none; transform: translate3d(0, calc((1 - var(--f, 0)) * var(--hero-m) * var(--pitch)), 0); will-change: transform; }
+.fd-clip { position: absolute; inset: 0; clip-path: inset(calc((1 - var(--k, 0)) * (50% - var(--ch) / 2)) calc((1 - var(--k, 0)) * (50% - var(--cw) / 2))); }
+.fd-own { position: absolute; left: 50%; top: 50%; width: var(--cw); margin: calc(var(--ch) / -2) 0 0 calc(var(--cw) / -2); }
+.fd-fill { position: absolute; inset: 0; background: var(--grad-btn); opacity: var(--l, 0); }
+
+/* Line 01 holds while the feed flies; line 02 is Ink on the lit screen. */
+.dr-motion .op-track { height: calc(var(--stage-h) + 1500px); }
+.dr-motion .op-line.n1 .hl { background: none; -webkit-text-fill-color: var(--brand-ink); color: var(--brand-ink); }
+.dr-motion .op-stage { --ink-k: calc(var(--k, 0) * 100%); }
+.dr-motion .op-stage .mono, .dr-motion .op-stage .dr-slate, .dr-motion .op-line.n1 .op-sub { color: color-mix(in srgb, var(--brand-ink) var(--ink-k), var(--text-muted)) !important; }
+.dr-motion .op-stage .tc { color: color-mix(in srgb, var(--brand-ink) var(--ink-k), var(--brand-bone)) !important; }
+.dr-motion .op-bottom .send { position: relative; z-index: 0; color: color-mix(in srgb, var(--brand-bone) var(--ink-k), var(--brand-ink)); }
+.dr-motion .op-bottom .send::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--brand-ink); opacity: var(--k, 0); }
+@media (prefers-reduced-motion: reduce) { .dr-motion .fd-roll { animation: none; } }
+
+/* The stage fills the whole screen, header included: the header floats over the feed, and the stage is as
+   tall as the screen with the phone's browser bar hidden, so the lit post never leaves a dark strip. */
+:root { --stage-h: 100vh; }
+@supports (height: 100svh) { :root { --stage-h: 100svh; } }
+.dr-motion .dr-nav { position: relative; z-index: 3; background: transparent; }
+.dr-motion .op-track { margin-top: calc(var(--nav-h) * -1); height: calc(100vh + 1500px); }
+.dr-motion .op-stage { height: 100vh; min-height: 560px; padding-top: calc(var(--nav-h) + 24px); }
+@supports (height: 100lvh) {
+  .dr-motion .op-track { height: calc(100lvh + 1500px); }
+  .dr-motion .op-stage { height: 100lvh; padding-bottom: calc(100lvh - 100svh + 40px); }
+}
+@media (max-width: 760px) {
+  .dr-motion .op-stage { padding-top: calc(var(--nav-h) + 14px); }
+  @supports (height: 100lvh) { .dr-motion .op-stage { padding-bottom: calc(100lvh - 100svh + 20px); } }
+}
