@@ -2,12 +2,32 @@
 (function () {
   var doc = document.documentElement;
   var raf = 0, motion = false, io = null;
+  var open = { el: null, target: 0, cur: 0, raf: 0, last: 0 };
 
   function timecode(ms) {
     var pad = function (n) { return String(n).padStart(2, '0'); };
     var s = Math.floor(ms / 1000);
     var f = Math.floor((ms % 1000) / (1000 / 24));
     return 'TC ' + pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60) + ':' + pad(f);
+  }
+
+  /* Only touch a custom property when its value changes, and set it on the element that uses it,
+     so a scroll frame restyles one section instead of the whole page. */
+  function setVar(el, k, v) { if (el && el.style.getPropertyValue(k) !== v) el.style.setProperty(k, v); }
+  function range(p, a, b) { return Math.min(1, Math.max(0, (p - a) / (b - a))); }
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  /* The cold open is scrubbed: the headline follows the scroll position, eased toward it each frame. */
+  function glideOpen(now) {
+    open.raf = 0;
+    var dt = Math.min(64, now - (open.last || now));
+    open.last = now;
+    var d = open.target - open.cur;
+    open.cur = Math.abs(d) < 0.0006 ? open.target : open.cur + d * (1 - Math.exp(-dt / 110));
+    setVar(open.el, '--o', ease(range(open.cur, 0.08, 0.54)).toFixed(4));
+    setVar(open.el, '--i', ease(range(open.cur, 0.40, 0.92)).toFixed(4));
+    if (open.cur !== open.target) open.raf = requestAnimationFrame(glideOpen);
+    else open.last = 0;
   }
 
   function countUp(el) {
@@ -25,12 +45,21 @@
   }
 
   function tick() {
+    var scrubs = document.querySelectorAll('[data-scrub]');
+    var prog = document.querySelector('.prog');
+    var hud = document.querySelector('.hud');
+    var mbar = document.querySelector('.mbar');
     if (!motion) {
-      ['--p-open', '--p-prompter', '--p-fn', '--p-steps', '--sc', '--a-fn', '--drop', '--scene', '--cta-bar', '--page-p', '--hud'].forEach(function (k) { doc.style.removeProperty(k); });
+      scrubs.forEach(function (el) { ['--p-' + el.getAttribute('data-scrub'), '--sc', '--o', '--i', '--a-fn', '--drop'].forEach(function (k) { el.style.removeProperty(k); }); });
+      if (prog) prog.style.removeProperty('--page-p');
+      if (hud) { hud.style.removeProperty('--hud'); hud.style.removeProperty('--scene'); }
+      if (mbar) mbar.style.removeProperty('--cta-bar');
       return;
     }
+    /* Read everything first, then write, so a frame never forces layout twice. */
     var vh = window.innerHeight;
-    document.querySelectorAll('[data-scrub]').forEach(function (el) {
+    var reads = [];
+    scrubs.forEach(function (el) {
       var r = el.getBoundingClientRect();
       var mode = el.getAttribute('data-mode');
       var p;
@@ -42,33 +71,39 @@
       } else {
         p = (vh - r.top) / (vh + r.height);
       }
-      p = Math.min(1, Math.max(0, p));
-      var key = el.getAttribute('data-scrub');
-      doc.style.setProperty('--p-' + key, p.toFixed(4));
-      if (key === 'open') {
-        var lines = Math.max(1, el.querySelectorAll('.op-line').length);
-        doc.style.setProperty('--sc', String(Math.min(lines - 1, Math.floor(p * lines))));
-      }
-      if (key === 'fn') {
-        var a = r.top > vh * 0.2 ? -1 : Math.min(3, Math.floor(p * 4));
-        doc.style.setProperty('--a-fn', String(a));
-        doc.style.setProperty('--drop', a >= 3 ? '1' : '0');
-      }
+      reads.push({ el: el, key: el.getAttribute('data-scrub'), top: r.top, p: Math.min(1, Math.max(0, p)) });
     });
     var max = Math.max(1, doc.scrollHeight - vh);
-    doc.style.setProperty('--page-p', (window.scrollY / max).toFixed(4));
-    var open = document.querySelector('.op-track');
+    var pageP = window.scrollY / max;
+    var openTrack = document.querySelector('.op-track');
     var idea = document.getElementById('idea');
-    var past = open ? open.getBoundingClientRect().bottom < vh * 0.25 : false;
+    var past = openTrack ? openTrack.getBoundingClientRect().bottom < vh * 0.25 : false;
     var atForm = idea ? idea.getBoundingClientRect().top < vh * 0.9 : false;
-    doc.style.setProperty('--cta-bar', past && !atForm ? '1' : '0');
-    doc.style.setProperty('--hud', past ? '1' : '0');
     var scene = '';
     document.querySelectorAll('[data-scene]').forEach(function (el) {
       var r = el.getBoundingClientRect();
       if (r.top <= vh * 0.5 && r.bottom > vh * 0.5) scene = el.getAttribute('data-scene');
     });
-    if (scene) doc.style.setProperty('--scene', '"' + scene.replace(/"/g, '') + '"');
+
+    reads.forEach(function (m) {
+      setVar(m.el, '--p-' + m.key, m.p.toFixed(4));
+      if (m.key === 'open') {
+        var lines = Math.max(1, m.el.querySelectorAll('.op-line').length);
+        setVar(m.el, '--sc', String(Math.min(lines - 1, Math.floor(m.p * lines))));
+        open.el = m.el;
+        open.target = m.p;
+        if (!open.raf) open.raf = requestAnimationFrame(glideOpen);
+      }
+      if (m.key === 'fn') {
+        var a = m.top > vh * 0.2 ? -1 : Math.min(3, Math.floor(m.p * 4));
+        setVar(m.el, '--a-fn', String(a));
+        setVar(m.el, '--drop', a >= 3 ? '1' : '0');
+      }
+    });
+    setVar(prog, '--page-p', pageP.toFixed(4));
+    setVar(mbar, '--cta-bar', past && !atForm ? '1' : '0');
+    setVar(hud, '--hud', past ? '1' : '0');
+    if (scene) setVar(hud, '--scene', '"' + scene.replace(/"/g, '') + '"');
   }
 
   function setup() {
@@ -104,8 +139,11 @@
   observe();
 
   var start = Date.now();
+  var clocks = document.querySelectorAll('.tc');
   setInterval(function () {
-    doc.style.setProperty('--tc', '"' + timecode(Date.now() - start) + '"');
+    if (document.hidden) return;
+    var tc = '"' + timecode(Date.now() - start) + '"';
+    clocks.forEach(function (el) { el.style.setProperty('--tc', tc); });
   }, 84);
 
   /* The idea form has no backend yet: it opens the visitor's email app with the idea filled in. */

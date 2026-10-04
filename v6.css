@@ -75,3 +75,23 @@
 .ig-bio { margin: 0; font-size: 16px; line-height: 1.5; color: var(--text); }
 .ig .dr-btn { width: 100%; }
 @media (max-width: 760px) { .ig { padding: 18px; } .ig-avatar { width: 60px; height: 60px; } }
+
+/* ---------- Cold open, scrubbed: the headline follows the scroll instead of firing timed transitions.
+   The page script eases two values onto .op-track: --o (line 01 leaving) and --i (line 02 arriving), 0 → 1. ---------- */
+.dr-motion .op-track { height: calc(var(--stage-h) + 1100px); }
+.dr-motion .op-line .drop > span,
+.dr-motion .op-line .op-label,
+.dr-motion .op-line .op-sub { transition: none; will-change: transform, opacity; }
+.dr-motion .op-line.n0 .drop > span {
+  --t: clamp(0, calc((var(--o, 0) - var(--d, 0) * 0.14) / 0.86), 1);
+  transform: translate3d(calc(var(--t) * -70%), 0, 0); opacity: calc(1 - var(--t) * 1.25); transition: none;
+}
+.dr-motion .op-line.n0 .op-label { opacity: calc(1 - var(--o, 0) * 2.5); }
+.dr-motion .op-line.n1 .drop > span {
+  --t: clamp(0, calc((var(--i, 0) - var(--d, 0) * 0.16) / 0.84), 1);
+  transform: translate3d(0, calc((1 - var(--t)) * -118%), 0); opacity: 1; transition: none;
+}
+.dr-motion .op-line.n1 .op-label { opacity: clamp(0, calc(var(--i, 0) * 2.5), 1); }
+.dr-motion .op-line.n1 .op-sub { opacity: clamp(0, calc(var(--i, 0) * 3 - 2), 1); transform: translate3d(0, calc((1 - var(--i, 0)) * 18px), 0); transition: none; }
+/* The page scrubber grows by transform, not width, so it never triggers layout. */
+.dr-motion .prog { width: 100%; transform-origin: 0 50%; transform: scaleX(var(--page-p, 0)); }
